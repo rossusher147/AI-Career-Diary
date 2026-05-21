@@ -72,7 +72,6 @@ Response: 200
 
 Errors:
 - 401: Missing or invalid token
-- 403: Access Denied
 - 404: Resource Not Found
 
 Implementation Mapping:
@@ -142,7 +141,6 @@ Response: 201
 Errors:
 - 400: Invalid request body
 - 401: Missing or invalid token
-- 403: Access Denied
 - 404: Resource Not Found
 
 Implementation Mapping:

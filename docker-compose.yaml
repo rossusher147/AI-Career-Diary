@@ -1,4 +1,18 @@
 services:
+  app-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: aicd
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - app-db-data:/var/lib/postgresql/data
+
   keycloak-db:
     image: postgres:16-alpine
     environment:
@@ -34,6 +48,24 @@ services:
     volumes:
       - ./src/infra/keycloak/aicd-realm.json:/opt/keycloak/data/import/aicd-realm.json:ro
 
+  backend:
+    build:
+      context: .
+      dockerfile: src/backend/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:password@app-db:5432/aicd
+      KEYCLOAK_BASE_URL: http://keycloak:8080
+      KEYCLOAK_REALM: aicd
+      KEYCLOAK_FRONTEND_CLIENT_ID: aicd-web
+      KEYCLOAK_API_AUDIENCE: aicd-api
+    depends_on:
+      app-db:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    ports:
+      - "8000:8000"
+
   structurizr:
     image: structurizr/structurizr
     command: ["local"]
@@ -41,3 +73,7 @@ services:
       - "8081:8080"
     volumes:
       - ./docs/C4:/usr/local/structurizr
+
+volumes:
+  app-db-data:
+  keycloak-db-data:
