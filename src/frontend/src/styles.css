@@ -69,4 +69,65 @@ body {
   .markdown-content a {
     @apply text-accent-strong underline underline-offset-2;
   }
+
+  .aicd-markdown-editor {
+    --accentText: #1f5c49;
+    --accentTextContrast: #1f5c49;
+    --basePageBg: #ffffff;
+    --baseBase: #ffffff;
+    --baseBgSubtle: #f7f8f5;
+    --baseBg: #edf2ee;
+    --baseBgHover: #dcece5;
+    --baseBgActive: #dcece5;
+    --baseLine: rgba(24, 33, 29, 0.1);
+    --baseBorder: rgba(24, 33, 29, 0.15);
+    --baseBorderHover: rgba(24, 33, 29, 0.35);
+    --baseText: #5f6f67;
+    --baseTextContrast: #18211d;
+    @apply min-h-[18rem] bg-white text-ink;
+  }
+
+  .aicd-markdown-editor-toolbar {
+    @apply gap-1 rounded-none border-b border-ink/10 bg-surface-muted p-2;
+  }
+
+  .aicd-markdown-editor-content {
+    @apply min-h-[18rem] px-4 py-4 text-base leading-7 text-ink;
+  }
+
+  .aicd-markdown-editor-content h1 {
+    @apply text-2xl font-semibold;
+  }
+
+  .aicd-markdown-editor-content h2 {
+    @apply text-xl font-semibold;
+  }
+
+  .aicd-markdown-editor-content h3 {
+    @apply text-lg font-semibold;
+  }
+
+  .aicd-markdown-editor-content p {
+    @apply leading-7;
+  }
+
+  .aicd-markdown-editor-content ul {
+    @apply list-disc space-y-2 pl-5;
+  }
+
+  .aicd-markdown-editor-content ol {
+    @apply list-decimal space-y-2 pl-5;
+  }
+
+  .aicd-markdown-editor-content blockquote {
+    @apply border-l-4 border-accent/30 pl-4 text-ink-muted;
+  }
+
+  .aicd-markdown-editor-content code {
+    @apply rounded bg-surface-muted px-1 py-0.5 text-sm;
+  }
+
+  .aicd-markdown-editor-content a {
+    @apply text-accent-strong underline underline-offset-2;
+  }
 }
