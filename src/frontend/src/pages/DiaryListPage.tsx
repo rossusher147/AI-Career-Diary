@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { DiaryRead } from "../api/types";
 import { Button } from "../components/Button";
-import { EmptyState } from "../components/EmptyState";
 import { ErrorBlock, LoadingBlock } from "../components/Feedback";
 import { useDiaryApi } from "../hooks";
 
@@ -59,16 +58,9 @@ export function DiaryListPage() {
       ) : null}
 
       {!isLoading && !error && diaries.length === 0 ? (
-        <EmptyState
-          action={
-            <Button onClick={() => navigate("/diaries/new")}>
-              <Plus aria-hidden="true" className="h-4 w-4" />
-              Create diary
-            </Button>
-          }
-          body="Create a private place for today's work notes."
-          title="Start your work diary"
-        />
+        <p className="rounded-md border border-ink/10 bg-surface-raised px-4 py-3 text-sm text-ink-muted">
+          You have not created any work diaries yet.
+        </p>
       ) : null}
 
       {!isLoading && !error && diaries.length > 0 ? (
