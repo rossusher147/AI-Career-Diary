@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: #18211d;
+  background: #f7f8f5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+@layer components {
+  .book-spread {
+    @apply grid gap-4 rounded-lg bg-[linear-gradient(90deg,rgba(24,33,29,0.06),rgba(24,33,29,0)_12%,rgba(24,33,29,0)_88%,rgba(24,33,29,0.06))] p-3 shadow-soft md:grid-cols-2 md:gap-3 md:p-5;
+  }
+
+  .book-page {
+    @apply min-h-[28rem] rounded-md border border-ink/10 bg-white px-5 py-6 text-ink shadow-page md:max-h-[38rem] md:overflow-y-auto md:px-7 md:py-8;
+  }
+
+  .markdown-content {
+    @apply space-y-4 text-base leading-7 text-ink;
+  }
+
+  .markdown-content h1 {
+    @apply text-2xl font-semibold;
+  }
+
+  .markdown-content h2 {
+    @apply text-xl font-semibold;
+  }
+
+  .markdown-content h3 {
+    @apply text-lg font-semibold;
+  }
+
+  .markdown-content p {
+    @apply leading-7;
+  }
+
+  .markdown-content ul {
+    @apply list-disc space-y-2 pl-5;
+  }
+
+  .markdown-content ol {
+    @apply list-decimal space-y-2 pl-5;
+  }
+
+  .markdown-content blockquote {
+    @apply border-l-4 border-accent/30 pl-4 text-ink-muted;
+  }
+
+  .markdown-content code {
+    @apply rounded bg-surface-muted px-1 py-0.5 text-sm;
+  }
+
+  .markdown-content pre {
+    @apply overflow-x-auto rounded-md bg-ink p-4 text-sm text-white;
+  }
+
+  .markdown-content a {
+    @apply text-accent-strong underline underline-offset-2;
+  }
+}
