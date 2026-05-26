@@ -1,6 +1,6 @@
-import { ArrowLeft, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import { InputField } from "../components/Field";
 import { ErrorBlock } from "../components/Feedback";
@@ -40,11 +40,6 @@ export function CreateDiaryPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <Link className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-ink-muted hover:text-ink" to="/diaries">
-        <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-        Diaries
-      </Link>
-
       <section className="rounded-lg bg-surface-raised p-6 shadow-soft sm:p-8">
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
