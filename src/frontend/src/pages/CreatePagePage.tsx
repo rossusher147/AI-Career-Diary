@@ -1,6 +1,6 @@
-import { ArrowLeft, Eye, Pencil, Save } from "lucide-react";
+import { Eye, Pencil, Save } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../components/Button";
 import { TextareaField } from "../components/Field";
 import { ErrorBlock } from "../components/Feedback";
@@ -51,11 +51,6 @@ export function CreatePagePage() {
 
   return (
     <div className="space-y-6">
-      <Link className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-ink-muted hover:text-ink" to={`/diaries/${diaryId}`}>
-        <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-        Back to diary
-      </Link>
-
       <form className="space-y-6" onSubmit={handleSubmit}>
         <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-2">
