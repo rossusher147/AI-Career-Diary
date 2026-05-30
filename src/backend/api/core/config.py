@@ -13,10 +13,12 @@ class Settings(BaseSettings):
     database_url: str = f"sqlite:///{DB_PATH}"
 
     keycloak_base_url: str = "http://localhost:8080"
+    keycloak_backend_base_url: str | None = None
     keycloak_realm: str = "aicd"
 
     keycloak_frontend_client_id: str = "aicd-ui"
     keycloak_api_audience: str = "aicd-api"
+    backend_cors_origins: str = "http://localhost:5173"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
@@ -34,7 +36,16 @@ class Settings(BaseSettings):
 
     @property
     def keycloak_jwks_url(self) -> str:
-        return f"{self.keycloak_issuer}/protocol/openid-connect/certs"
+        base_url = self.keycloak_backend_base_url or self.keycloak_base_url
+        return f"{base_url}/realms/{self.keycloak_realm}/protocol/openid-connect/certs"
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [
+            origin.strip()
+            for origin in self.backend_cors_origins.split(",")
+            if origin.strip()
+        ]
 
 
 @lru_cache

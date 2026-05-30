@@ -12,9 +12,9 @@ class DiaryRead(SQLModel):
 
 
 class PageCreate(SQLModel):
-    content: str
+    content: str = Field(description="Raw Markdown content.")
 
 class PageRead(SQLModel):
     id: int
     created_at: datetime
-    content: str
+    content: str = Field(description="Raw Markdown content.")
