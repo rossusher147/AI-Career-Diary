@@ -18,24 +18,129 @@ body {
 }
 
 @layer components {
+  .diary-detail {
+    @apply flex flex-col gap-3;
+    height: calc(100vh - 7.5rem);
+    height: calc(100dvh - 7.5rem);
+    min-height: 0;
+  }
+
+  .diary-detail__header {
+    @apply flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  .diary-detail__heading {
+    @apply min-w-0 space-y-2;
+  }
+
+  .diary-detail__back-link {
+    @apply inline-flex min-h-8 items-center gap-2 text-sm font-medium text-ink-muted hover:text-ink;
+  }
+
+  .diary-detail__title {
+    @apply truncate text-2xl font-semibold text-ink sm:text-3xl;
+  }
+
+  .diary-actions {
+    @apply flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-end;
+  }
+
+  .book-toolbar {
+    @apply flex shrink-0 justify-start;
+  }
+
+  .date-filter {
+    @apply relative w-full sm:w-auto;
+  }
+
+  .date-filter__buttons {
+    @apply flex gap-2;
+  }
+
+  .date-filter__trigger {
+    @apply w-full justify-between px-3 sm:w-auto sm:min-w-[13rem];
+  }
+
+  .date-filter__trigger--active {
+    @apply border-accent/30 bg-accent-soft text-accent-strong;
+  }
+
+  .date-filter__trigger-label {
+    @apply min-w-0 truncate;
+  }
+
+  .date-filter__clear {
+    @apply min-h-11 w-11 px-0;
+  }
+
+  .date-filter__panel {
+    @apply absolute left-0 top-[calc(100%+0.5rem)] z-40 w-[min(22rem,calc(100vw-2rem))] space-y-4 rounded-lg border border-ink/10 bg-surface-raised p-4 text-left shadow-page;
+  }
+
+  .date-filter__mode {
+    @apply grid grid-cols-2 rounded-md bg-surface-muted p-1;
+  }
+
+  .date-filter__mode-button {
+    @apply min-h-10 rounded px-3 text-sm font-medium text-ink-muted transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent;
+  }
+
+  .date-filter__mode-button--active {
+    @apply bg-white text-ink shadow-sm;
+  }
+
+  .date-filter__field {
+    @apply grid gap-2 text-sm font-medium text-ink;
+  }
+
+  .date-filter__input {
+    @apply min-h-11 rounded-md border border-ink/15 bg-white px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20;
+  }
+
+  .date-filter__range {
+    @apply grid gap-3 sm:grid-cols-2;
+  }
+
+  .date-filter__actions {
+    @apply flex justify-end gap-2 border-t border-ink/10 pt-4;
+  }
+
   .book-reader {
-    @apply space-y-3;
+    @apply flex min-h-0 flex-1 flex-col gap-3;
   }
 
   .book-reader__controls {
-    @apply grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2;
+    @apply shrink-0 grid grid-cols-2 items-center gap-2 sm:grid-cols-[auto_auto_auto] sm:justify-center;
+    grid-template-areas:
+      "counter counter"
+      "previous next";
+  }
+
+  @media (min-width: 640px) {
+    .book-reader__controls {
+      grid-template-areas: "previous counter next";
+    }
   }
 
   .book-reader__nav-button {
-    @apply w-full px-2 sm:min-w-32 sm:px-4;
+    @apply w-full px-3 sm:w-auto sm:min-w-[8rem] sm:px-4;
+  }
+
+  .book-reader__nav-button--previous {
+    grid-area: previous;
+  }
+
+  .book-reader__nav-button--next {
+    grid-area: next;
   }
 
   .book-reader__counter {
-    @apply whitespace-nowrap text-center text-xs font-medium text-ink-muted sm:text-sm;
+    @apply min-w-[9rem] whitespace-nowrap text-center text-xs font-medium text-ink-muted sm:text-sm;
+    grid-area: counter;
   }
 
   .book-spread {
-    @apply relative isolate grid gap-3 overflow-hidden rounded-lg p-3 shadow-soft sm:grid-cols-2 sm:gap-0 sm:p-5;
+    @apply relative isolate grid min-h-0 flex-1 gap-3 overflow-hidden rounded-lg p-3 shadow-soft sm:grid-cols-2 sm:gap-0 sm:p-5;
     background:
       linear-gradient(90deg, rgba(24, 33, 29, 0.08), rgba(24, 33, 29, 0) 12%, rgba(24, 33, 29, 0) 88%, rgba(24, 33, 29, 0.08)),
       #edf2ee;
@@ -52,7 +157,7 @@ body {
   }
 
   .book-page {
-    @apply relative z-10 flex min-h-[28rem] flex-col overflow-hidden rounded-md border border-ink/10 bg-white px-5 py-6 text-ink shadow-page sm:min-h-[34rem] sm:max-h-[38rem] sm:px-7 sm:py-8;
+    @apply relative z-10 flex h-full min-h-0 flex-col overflow-hidden rounded-md border border-ink/10 bg-white px-5 py-5 text-ink shadow-page sm:px-7 sm:py-6;
   }
 
   .book-page--left {
@@ -84,7 +189,7 @@ body {
   }
 
   .book-page__date {
-    @apply mb-5 text-sm font-medium text-ink-muted;
+    @apply mb-3 shrink-0 text-sm font-medium text-ink-muted;
   }
 
   .book-page__body {
@@ -92,11 +197,11 @@ body {
   }
 
   .book-page__folio {
-    @apply mt-6 block text-center text-xs font-medium text-ink-subtle;
+    @apply mt-3 block shrink-0 text-center text-xs font-medium text-ink-subtle;
   }
 
   .book-turn-sheet {
-    @apply pointer-events-none absolute bottom-5 top-5 z-30 hidden flex-col overflow-hidden border border-ink/10 bg-white px-7 py-8 text-ink shadow-page sm:flex;
+    @apply pointer-events-none absolute bottom-5 top-5 z-30 hidden flex-col overflow-hidden border border-ink/10 bg-white px-7 py-6 text-ink shadow-page sm:flex;
     backface-visibility: hidden;
     transform-style: preserve-3d;
     width: calc((100% - 2.5rem) / 2);
@@ -107,14 +212,14 @@ body {
     right: 1.25rem;
     transform-origin: left center;
     border-radius: 0 0.375rem 0.375rem 0;
-    animation: book-turn-next 680ms cubic-bezier(0.2, 0.72, 0.2, 1) both;
+    animation: book-turn-next 260ms ease-out both;
   }
 
   .book-turn-sheet--previous {
     left: 1.25rem;
     transform-origin: right center;
     border-radius: 0.375rem 0 0 0.375rem;
-    animation: book-turn-previous 680ms cubic-bezier(0.2, 0.72, 0.2, 1) both;
+    animation: book-turn-previous 260ms ease-out both;
   }
 
   .book-turn-sheet--blank {
@@ -127,7 +232,7 @@ body {
 
   .book-spread--turning-next .book-page--right,
   .book-spread--turning-previous .book-page--left {
-    animation: book-page-reveal 680ms ease-out both;
+    animation: book-page-reveal 260ms ease-out both;
   }
 
   .markdown-content {

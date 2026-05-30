@@ -19,13 +19,18 @@ interface TurnState {
   outgoingPageNumber: number;
 }
 
-const PAGE_TURN_DURATION_MS = 680;
+const PAGE_TURN_DURATION_MS = 260;
 
 export function BookSpread({ onAddPage, pages }: BookSpreadProps) {
   const [spreadIndex, setSpreadIndex] = useState(0);
   const [turn, setTurn] = useState<TurnState | null>(null);
   const spreadCount = Math.max(1, Math.ceil(pages.length / 2));
   const activeSpreadIndex = Math.min(spreadIndex, spreadCount - 1);
+
+  useEffect(() => {
+    setSpreadIndex(0);
+    setTurn(null);
+  }, [pages]);
 
   useEffect(() => {
     setSpreadIndex((currentIndex) => Math.min(currentIndex, spreadCount - 1));
@@ -99,32 +104,6 @@ export function BookSpread({ onAddPage, pages }: BookSpreadProps) {
 
   return (
     <div className="book-reader">
-      <div className="book-reader__controls">
-        <Button
-          aria-label="Previous page spread"
-          className="book-reader__nav-button"
-          disabled={!hasPreviousSpread || Boolean(turn)}
-          onClick={() => turnPage("previous")}
-          variant="secondary"
-        >
-          <ChevronLeft aria-hidden="true" className="h-4 w-4" />
-          Previous
-        </Button>
-        <p aria-live="polite" className="book-reader__counter">
-          {pageRangeLabel}
-        </p>
-        <Button
-          aria-label="Next page spread"
-          className="book-reader__nav-button"
-          disabled={!hasNextSpread || Boolean(turn)}
-          onClick={() => turnPage("next")}
-          variant="secondary"
-        >
-          Next
-          <ChevronRight aria-hidden="true" className="h-4 w-4" />
-        </Button>
-      </div>
-
       <section
         aria-label="Diary pages"
         className={[
@@ -140,6 +119,32 @@ export function BookSpread({ onAddPage, pages }: BookSpreadProps) {
         <BookPage page={rightPage} pageNumber={firstPageNumber + 1} side="right" />
         {turn ? <TurningPage turn={turn} /> : null}
       </section>
+
+      <nav aria-label="Diary page spread pagination" className="book-reader__controls">
+        <Button
+          aria-label="Previous page spread"
+          className="book-reader__nav-button book-reader__nav-button--previous"
+          disabled={!hasPreviousSpread || Boolean(turn)}
+          onClick={() => turnPage("previous")}
+          variant="secondary"
+        >
+          <ChevronLeft aria-hidden="true" className="h-4 w-4" />
+          Previous
+        </Button>
+        <p aria-live="polite" className="book-reader__counter">
+          {pageRangeLabel}
+        </p>
+        <Button
+          aria-label="Next page spread"
+          className="book-reader__nav-button book-reader__nav-button--next"
+          disabled={!hasNextSpread || Boolean(turn)}
+          onClick={() => turnPage("next")}
+          variant="secondary"
+        >
+          Next
+          <ChevronRight aria-hidden="true" className="h-4 w-4" />
+        </Button>
+      </nav>
     </div>
   );
 }
