@@ -13,6 +13,11 @@ class DiaryRead(SQLModel):
 
 class PageCreate(SQLModel):
     content: str = Field(description="Raw Markdown content.")
+    created_at: datetime = Field(description="Date of the page (in UTC).")
+
+class PageUpdate(SQLModel):
+    content: str = Field(description="Raw Markdown content.")
+    created_at: datetime = Field(description="Date of the page (in UTC).")
 
 class PageRead(SQLModel):
     id: int

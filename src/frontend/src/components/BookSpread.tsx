@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Pen } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { PageRead } from "../api/types";
 import { formatPageDate } from "../utils/dates";
@@ -8,10 +8,14 @@ import { MarkdownContent } from "./MarkdownContent";
 interface BookSpreadProps {
   pages: PageRead[];
   onAddPage: () => void;
+  onEditPage?: (page: PageRead) => void;
 }
 
 type PageSide = "left" | "right";
 type TurnDirection = "previous" | "next";
+type GoToSpreadOptions = {
+  animate?: boolean;
+};
 
 interface TurnState {
   direction: TurnDirection;
@@ -21,7 +25,7 @@ interface TurnState {
 
 const PAGE_TURN_DURATION_MS = 260;
 
-export function BookSpread({ onAddPage, pages }: BookSpreadProps) {
+export function BookSpread({ onAddPage, onEditPage, pages }: BookSpreadProps) {
   const [spreadIndex, setSpreadIndex] = useState(0);
   const [turn, setTurn] = useState<TurnState | null>(null);
   const spreadCount = Math.max(1, Math.ceil(pages.length / 2));
@@ -55,33 +59,46 @@ export function BookSpread({ onAddPage, pages }: BookSpreadProps) {
   }, [activeSpreadIndex, pages]);
 
   const firstPageNumber = activeSpreadIndex * 2 + 1;
-  const lastPageNumber = Math.min(firstPageNumber + 1, pages.length);
-  const pageRangeLabel =
-    firstPageNumber === lastPageNumber
-      ? `Page ${firstPageNumber} of ${pages.length}`
-      : `Pages ${firstPageNumber}-${lastPageNumber} of ${pages.length}`;
   const hasPreviousSpread = activeSpreadIndex > 0;
   const hasNextSpread = activeSpreadIndex < spreadCount - 1;
 
-  function turnPage(direction: TurnDirection) {
+  function goToSpread(targetIndex: number, options: GoToSpreadOptions = {}) {
     if (turn) {
       return;
     }
-
-    const targetIndex = direction === "next" ? activeSpreadIndex + 1 : activeSpreadIndex - 1;
 
     if (targetIndex < 0 || targetIndex >= spreadCount) {
       return;
     }
 
-    const outgoingPageIndex = direction === "next" ? activeSpreadIndex * 2 + 1 : activeSpreadIndex * 2;
+    if (targetIndex === activeSpreadIndex) {
+      return;
+    }
 
-    setTurn({
-      direction,
-      outgoingPage: pages[outgoingPageIndex] ?? null,
-      outgoingPageNumber: outgoingPageIndex + 1
-    });
+    const direction: TurnDirection = targetIndex > activeSpreadIndex ? "next" : "previous";
+
+    if (options.animate && Math.abs(targetIndex - activeSpreadIndex) === 1) {
+      const outgoingPageIndex = direction === "next" ? activeSpreadIndex * 2 + 1 : activeSpreadIndex * 2;
+
+      setTurn({
+        direction,
+        outgoingPage: pages[outgoingPageIndex] ?? null,
+        outgoingPageNumber: outgoingPageIndex + 1
+      });
+    } else {
+      setTurn(null);
+    }
+
     setSpreadIndex(targetIndex);
+  }
+
+  function goToSelectedSpread(spreadNumber: number) {
+    if (turn || !Number.isInteger(spreadNumber)) {
+      return;
+    }
+
+    const targetSpreadNumber = Math.min(Math.max(spreadNumber, 1), spreadCount);
+    goToSpread(targetSpreadNumber - 1);
   }
 
   if (pages.length === 0) {
@@ -115,41 +132,84 @@ export function BookSpread({ onAddPage, pages }: BookSpreadProps) {
           .join(" ")}
       >
         <span aria-hidden="true" className="book-spread__gutter" />
-        <BookPage page={leftPage} pageNumber={firstPageNumber} side="left" />
-        <BookPage page={rightPage} pageNumber={firstPageNumber + 1} side="right" />
+        <BookPage page={leftPage} pageNumber={firstPageNumber} side="left" onEdit={onEditPage} />
+        <BookPage page={rightPage} pageNumber={firstPageNumber + 1} side="right" onEdit={onEditPage} />
         {turn ? <TurningPage turn={turn} /> : null}
       </section>
 
       <nav aria-label="Diary page spread pagination" className="book-reader__controls">
         <Button
-          aria-label="Previous page spread"
-          className="book-reader__nav-button book-reader__nav-button--previous"
+          aria-label="Go to first page"
+          className="book-reader__nav-button"
           disabled={!hasPreviousSpread || Boolean(turn)}
-          onClick={() => turnPage("previous")}
+          onClick={() => goToSpread(0)}
+          variant="secondary"
+        >
+          <ChevronsLeft aria-hidden="true" className="h-4 w-4" />
+          First
+        </Button>
+        <Button
+          aria-label="Go back one page spread"
+          className="book-reader__nav-button"
+          disabled={!hasPreviousSpread || Boolean(turn)}
+          onClick={() => goToSpread(activeSpreadIndex - 1, { animate: true })}
           variant="secondary"
         >
           <ChevronLeft aria-hidden="true" className="h-4 w-4" />
-          Previous
+          Back
         </Button>
-        <p aria-live="polite" className="book-reader__counter">
-          {pageRangeLabel}
-        </p>
+        <label className="book-reader__page-picker">
+          <span className="book-reader__page-label">Page</span>
+          <select
+            aria-label="Select page range"
+            className="book-reader__page-select"
+            disabled={Boolean(turn)}
+            onChange={(event) => goToSelectedSpread(Number(event.target.value))}
+            value={activeSpreadIndex + 1}
+          >
+            {Array.from({ length: spreadCount }, (_, index) => {
+              const spreadNumber = index + 1;
+              const optionFirstPageNumber = index * 2 + 1;
+              const optionLastPageNumber = Math.min(optionFirstPageNumber + 1, pages.length);
+              const optionLabel =
+                optionFirstPageNumber === optionLastPageNumber
+                  ? String(optionFirstPageNumber)
+                  : `${optionFirstPageNumber}-${optionLastPageNumber}`;
+
+              return (
+                <option key={spreadNumber} value={spreadNumber}>
+                  {optionLabel}
+                </option>
+              );
+            })}
+          </select>
+        </label>
         <Button
-          aria-label="Next page spread"
-          className="book-reader__nav-button book-reader__nav-button--next"
+          aria-label="Go to next page spread"
+          className="book-reader__nav-button"
           disabled={!hasNextSpread || Boolean(turn)}
-          onClick={() => turnPage("next")}
+          onClick={() => goToSpread(activeSpreadIndex + 1, { animate: true })}
           variant="secondary"
         >
           Next
           <ChevronRight aria-hidden="true" className="h-4 w-4" />
+        </Button>
+        <Button
+          aria-label="Go to last page"
+          className="book-reader__nav-button"
+          disabled={!hasNextSpread || Boolean(turn)}
+          onClick={() => goToSpread(spreadCount - 1)}
+          variant="secondary"
+        >
+          Last
+          <ChevronsRight aria-hidden="true" className="h-4 w-4" />
         </Button>
       </nav>
     </div>
   );
 }
 
-function BookPage({ page, pageNumber, side }: { page: PageRead | null; pageNumber: number; side: PageSide }) {
+function BookPage({ page, pageNumber, side, onEdit }: { page: PageRead | null; pageNumber: number; side: PageSide; onEdit?: (page: PageRead) => void }) {
   const isBlank = !page;
 
   return (
@@ -159,6 +219,14 @@ function BookPage({ page, pageNumber, side }: { page: PageRead | null; pageNumbe
     >
       {page ? (
         <>
+          <button
+            aria-label="Edit this page"
+            className="absolute top-3 right-3 p-1.5 rounded hover:bg-accent-soft text-ink-muted hover:text-accent transition-colors"
+            onClick={() => onEdit?.(page)}
+            title="Edit page"
+          >
+            <Pen className="h-4 w-4" />
+          </button>
           <p className="book-page__date">{formatPageDate(page.created_at)}</p>
           <div className="book-page__body">
             <MarkdownContent content={page.content} />

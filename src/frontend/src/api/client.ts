@@ -1,5 +1,5 @@
 import { appConfig } from "../config";
-import type { DiaryCreate, DiaryRead, PageCreate, PageRead } from "./types";
+import type { DiaryCreate, DiaryRead, PageCreate, PageRead, PageUpdate } from "./types";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -75,6 +75,11 @@ export function createDiaryApi(getToken: TokenProvider) {
       request<PageRead>(`/diaries/${diaryId}/pages`, getToken, {
         method: "POST",
         body: JSON.stringify(page)
+      }),
+    updatePage: (diaryId: number, pageId: number, page: PageUpdate) =>
+      request<PageRead>(`/diaries/${diaryId}/pages/${pageId}`, getToken, {
+        method: "PUT",
+        body: JSON.stringify(page)
       })
   };
 }
@@ -135,7 +140,7 @@ function createMockDiaryApi() {
         throw new ApiError(404, "We couldn't find that diary.");
       }
 
-      return state.pagesByDiaryId[String(diaryId)] ?? [];
+      return sortPagesByDate(state.pagesByDiaryId[String(diaryId)] ?? []);
     },
     async createPage(diaryId: number, page: PageCreate) {
       const state = readState();
@@ -145,9 +150,17 @@ function createMockDiaryApi() {
         throw new ApiError(404, "We couldn't find that diary.");
       }
 
+      const existingPages = state.pagesByDiaryId[String(diaryId)] ?? [];
+      const pageDate = toUtcDateValue(page.created_at);
+      const duplicatePage = existingPages.some((existingPage) => toUtcDateValue(existingPage.created_at) === pageDate);
+
+      if (duplicatePage) {
+        throw new ApiError(409, "A page already exists for this date.");
+      }
+
       const created: PageRead = {
         id: Date.now(),
-        created_at: new Date().toISOString(),
+        created_at: page.created_at,
         content: page.content
       };
 
@@ -160,6 +173,62 @@ function createMockDiaryApi() {
       });
 
       return created;
+    },
+    async updatePage(diaryId: number, pageId: number, page: PageUpdate) {
+      const state = readState();
+      const pages = state.pagesByDiaryId[String(diaryId)] ?? [];
+      const pageIndex = pages.findIndex((p) => p.id === pageId);
+
+      if (pageIndex === -1) {
+        throw new ApiError(404, "We couldn't find that page.");
+      }
+
+      const pageDate = toUtcDateValue(page.created_at);
+      const duplicatePage = pages.some(
+        (existingPage) => existingPage.id !== pageId && toUtcDateValue(existingPage.created_at) === pageDate
+      );
+
+      if (duplicatePage) {
+        throw new ApiError(409, "A page already exists for this date.");
+      }
+
+      const updated: PageRead = {
+        id: pageId,
+        created_at: page.created_at,
+        content: page.content
+      };
+
+      pages[pageIndex] = updated;
+
+      writeState({
+        ...state,
+        pagesByDiaryId: {
+          ...state.pagesByDiaryId,
+          [diaryId]: pages
+        }
+      });
+
+      return updated;
     }
   };
+}
+
+function toUtcDateValue(value: string) {
+  return new Date(value).toISOString().split("T")[0];
+}
+
+function sortPagesByDate(pages: PageRead[]) {
+  return [...pages].sort((leftPage, rightPage) => {
+    const leftTime = new Date(leftPage.created_at).getTime();
+    const rightTime = new Date(rightPage.created_at).getTime();
+    const timeDifference =
+      (Number.isNaN(leftTime) ? Number.MAX_SAFE_INTEGER : leftTime) -
+      (Number.isNaN(rightTime) ? Number.MAX_SAFE_INTEGER : rightTime);
+
+    if (timeDifference !== 0) {
+      return timeDifference;
+    }
+
+    return leftPage.id - rightPage.id;
+  });
 }
