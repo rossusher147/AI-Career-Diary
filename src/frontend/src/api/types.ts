@@ -9,6 +9,12 @@ export interface DiaryRead {
 
 export interface PageCreate {
   content: string;
+  created_at: string;
+}
+
+export interface PageUpdate {
+  content: string;
+  created_at: string;
 }
 
 export interface PageRead {

@@ -32,13 +32,17 @@ export function DiaryDetailPage() {
     return diaries.find((diary) => diary.id === diaryId)?.name ?? state.diaryName ?? "Work Diary";
   }, [diaries, diaryId, state.diaryName]);
 
+  const sortedPages = useMemo(() => {
+    return [...pages].sort(comparePagesByDate);
+  }, [pages]);
+
   const filteredPages = useMemo(() => {
     if (!dateFilter) {
-      return pages;
+      return sortedPages;
     }
 
-    return pages.filter((page) => pageMatchesDateFilter(page, dateFilter));
-  }, [dateFilter, pages]);
+    return sortedPages.filter((page) => pageMatchesDateFilter(page, dateFilter));
+  }, [dateFilter, sortedPages]);
 
   const isDateFiltered = Boolean(dateFilter);
 
@@ -122,7 +126,11 @@ export function DiaryDetailPage() {
       ) : null}
 
       {!isLoading && !error && (!isDateFiltered || filteredPages.length > 0) ? (
-        <BookSpread onAddPage={() => navigate(`/diaries/${diaryId}/pages/new`, { state: { diaryName } })} pages={filteredPages} />
+        <BookSpread
+          onAddPage={() => navigate(`/diaries/${diaryId}/pages/new`, { state: { diaryName } })}
+          onEditPage={(page) => navigate(`/diaries/${diaryId}/pages/${page.id}/edit`, { state: { diaryName, pageData: page } })}
+          pages={filteredPages}
+        />
       ) : null}
     </div>
   );
@@ -151,6 +159,22 @@ function pageMatchesDateFilter(page: PageRead, filter: DateFilterValue): boolean
   }
 
   return true;
+}
+
+function comparePagesByDate(leftPage: PageRead, rightPage: PageRead): number {
+  const leftTime = toComparableTime(leftPage.created_at);
+  const rightTime = toComparableTime(rightPage.created_at);
+
+  if (leftTime !== rightTime) {
+    return leftTime - rightTime;
+  }
+
+  return leftPage.id - rightPage.id;
+}
+
+function toComparableTime(value: string): number {
+  const time = new Date(value).getTime();
+  return Number.isNaN(time) ? Number.MAX_SAFE_INTEGER : time;
 }
 
 function toInputDateValue(value: string): string {
