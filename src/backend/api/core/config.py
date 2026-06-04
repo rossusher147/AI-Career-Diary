@@ -12,8 +12,9 @@ class Settings(BaseSettings):
     DB_PATH.parent.mkdir(exist_ok=True)
     database_url: str = f"sqlite:///{DB_PATH}"
 
-    keycloak_base_url: str = "http://localhost:8080"
+    keycloak_base_url: str = "http://keycloak:8080"
     keycloak_backend_base_url: str | None = None
+    keycloak_issuer_url: str = "http://localhost:8080"
     keycloak_realm: str = "aicd"
 
     keycloak_frontend_client_id: str = "aicd-ui"
@@ -24,7 +25,7 @@ class Settings(BaseSettings):
 
     @property
     def keycloak_issuer(self) -> str:
-        return f"{self.keycloak_base_url}/realms/{self.keycloak_realm}"
+        return f"{self.keycloak_issuer_url}/realms/{self.keycloak_realm}"
 
     @property
     def keycloak_authorization_url(self) -> str:

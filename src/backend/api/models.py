@@ -3,8 +3,8 @@
 Import this module in Alembic so SQLModel metadata includes every table model.
 """
 
-from datetime import datetime, timezone, date
-from sqlalchemy import Column, Text, UniqueConstraint, Index, func
+from datetime import datetime, timezone
+from sqlalchemy import Column, Text
 from sqlmodel import SQLModel, Field, Relationship
 
 
@@ -34,10 +34,6 @@ class Diary(SQLModel, table=True):
 
 class Page(SQLModel, table=True):
     __tablename__ = "page"
-    __table_args__ = (
-        Index('idx_diary_created_date', 'diary_id', func.date(Column('created_at')), unique=True),
-        Index('idx_page_diary_created_at', 'diary_id', 'created_at'),
-    )
 
     id: int | None = Field(default=None, primary_key=True)
     created_at: datetime = Field(default_factory=utc_now)
