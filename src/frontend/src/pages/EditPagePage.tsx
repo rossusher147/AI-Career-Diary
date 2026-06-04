@@ -115,7 +115,7 @@ export function EditPagePage() {
           />
         </section>
 
-        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <div className="sticky bottom-0 z-10 -mx-1 flex flex-col-reverse gap-3 bg-surface/95 px-1 py-3 backdrop-blur sm:flex-row sm:justify-end">
           <Button onClick={() => navigate(`/diaries/${diaryId}`)} type="button" variant="secondary">
             Cancel
           </Button>

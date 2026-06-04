@@ -283,7 +283,7 @@ body {
     --baseBorderHover: rgba(24, 33, 29, 0.35);
     --baseText: #5f6f67;
     --baseTextContrast: #18211d;
-    --editor-height: clamp(18rem, 52dvh, 32rem);
+    --editor-height: clamp(14rem, 38dvh, 24rem);
     height: var(--editor-height);
     @apply flex min-h-0 flex-col overflow-hidden bg-white text-ink;
   }
