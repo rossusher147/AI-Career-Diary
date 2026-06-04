@@ -28,7 +28,6 @@ def get_current_user(
 ) -> dict[str, Any]:
     try:
         signing_key = jwks_client.get_signing_key_from_jwt(token)
-
         payload = jwt.decode(
             token,
             signing_key.key,
@@ -39,13 +38,12 @@ def get_current_user(
                 "require": ["exp", "iat", "iss", "sub"],
             },
         )
-
         return payload
 
-    except InvalidTokenError as exc:
+    except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication token",
+            detail="Invalid authentication token:" + str(exc),
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
